@@ -1,6 +1,8 @@
 import requests
+import json
 
 from pprint import pprint
+from io import StringIO
 
 
 URL = 'https://api.vk.com/method/photos.get'
@@ -16,7 +18,7 @@ params = {
     'photo_sizes': '1'
 }
 
-def max_size_pic(data, pics_num):
+def max_size_pic(data):
     i = 0
     pics = []
     albums = data['response']['items']
@@ -31,11 +33,20 @@ def max_size_pic(data, pics_num):
                 pics[i]['file_name'] = '{}.jpg'.format(albums[i]['likes']['count'])
                 pics[i]['size'] = '{}x{}'.format(albums[i]['sizes'][size]['height'], albums[i]['sizes'][size]['width'])
                 pics[i]['url'] = albums[i]['sizes'][size]['url']
-        print(pics[i])
+#        print(pics[i])
         i += 1
-    #return
+    return pics
+
+def json_dumping(data_in):
+    with open('output.json', 'w') as f:
+        json.dump(data_in, f)
+
+    with open('output.json') as f:
+        data_out = json.load(f)
+        pprint(data_out)
+
 
 if __name__ == '__main__':
     res = requests.get(URL, params=params).json()
-    max_size_pic(res, 5)
-    pprint(res['response']['items'])
+    json_dumping(max_size_pic(res))
+    #pprint(res['response']['items'])
