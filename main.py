@@ -16,6 +16,26 @@ params = {
     'photo_sizes': '1'
 }
 
+def max_size_pic(data, pics_num):
+    i = 0
+    pics = []
+    albums = data['response']['items']
+    for n in range(len(albums)):
+        pics.append({'file_name': '', 'size': '', 'url': ''})
+
+    while i < len(albums):
+        tmp_height = albums[i]['sizes'][0]['height']
+        for size in range(len(albums[i]['sizes'])):
+            if albums[i]['sizes'][size]['height'] > tmp_height:
+                tmp_height = albums[i]['sizes'][size]['height']
+                pics[i]['file_name'] = '{}.jpg'.format(albums[i]['likes']['count'])
+                pics[i]['size'] = '{}x{}'.format(albums[i]['sizes'][size]['height'], albums[i]['sizes'][size]['width'])
+                pics[i]['url'] = albums[i]['sizes'][size]['url']
+        print(pics[i])
+        i += 1
+    #return
+
 if __name__ == '__main__':
-    r = requests.get(URL, params=params)
-    pprint(r.json())
+    res = requests.get(URL, params=params).json()
+    max_size_pic(res, 5)
+    pprint(res['response']['items'])
