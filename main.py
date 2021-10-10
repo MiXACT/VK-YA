@@ -1,10 +1,17 @@
 import requests
 import json
+import time
+from tqdm import tqdm
 
-from pprint import pprint
 
 vk_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
-ya_token = ''
+
+
+def get_pics_from_vk(num=5):
+    for i in tqdm(range(num)):
+        uploader.upload(max_pics[i]['url'], max_pics[i]['file_name'])
+        time.sleep(0.25)
+    return f'Фотографии из ВК скачаны в Яндекс.Диск'
 
 
 class VKpics:
@@ -52,6 +59,7 @@ class VKpics:
         #     data_out = json.load(f)
         #     pprint(data_out)
 
+
 class YaUploader:
     def __init__(self, token: str):
         self.token = token
@@ -79,13 +87,15 @@ class YaUploader:
 
 if __name__ == '__main__':
     vk_id = input('Введите ID пользователя ВКонтакте (числовое значение): ')
+    ya_token = input('Введите TOKEN для авторизации в Яндекс.Диске: ')
+
     vk_pics = VKpics(vk_token)
-    pics_list = vk_pics.get_pics_by_id(int(vk_id))    # 552934290
+    uploader = YaUploader(ya_token)
+
+    pics_list = vk_pics.get_pics_by_id(int(vk_id))  # 552934290
     max_pics = vk_pics.max_size_pic(pics_list)
     vk_pics.json_dumping(max_pics)
 
-    uploader = YaUploader(ya_token)
     uploader.make_dir()
 
-    for i in range(len(max_pics)):
-        uploader.upload(max_pics[i]['url'], max_pics[i]['file_name'])
+    print(get_pics_from_vk())
