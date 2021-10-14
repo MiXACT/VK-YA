@@ -10,7 +10,7 @@ vk_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f
 def get_pics_from_vk(num=5):
     for i in tqdm(range(num)):
         uploader.upload(max_pics[i]['url'], max_pics[i]['file_name'])
-        time.sleep(0.25)
+        time.sleep(0.5)
     return f'Фотографии из ВК скачаны в Яндекс.Диск'
 
 
@@ -34,30 +34,30 @@ class VKpics:
         """Метод принимает на вход json объект стриницы ВКонтакте
         и возвращает информацию о фотографиях в виде списка словарей с ключами 'file_name', 'size', 'url'"""
         i = 0
+        f_names = []
         pics = []
         albums = data['response']['items']
-        for n in range(len(albums)):
-            pics.append({'file_name': '', 'size': '', 'url': ''})
 
         while i < len(albums):
+            pics.append({})
             tmp_height = albums[i]['sizes'][0]['height']
             for size in range(len(albums[i]['sizes'])):
                 if albums[i]['sizes'][size]['height'] > tmp_height:
                     tmp_height = albums[i]['sizes'][size]['height']
-                    pics[i]['file_name'] = '{}.jpg'.format(albums[i]['likes']['count'])
                     pics[i]['size'] = '{}x{}'.format(albums[i]['sizes'][size]['height'],
                                                      albums[i]['sizes'][size]['width'])
                     pics[i]['url'] = albums[i]['sizes'][size]['url']
+            pics[i]['file_name'] = f"{albums[i]['likes']['count']}"
+            if pics[i]['file_name'] in f_names:
+                pics[i]['file_name'] += time.strftime("_%D_%H-%M", time.localtime(albums[i]['date'])).replace('/', '.')
+            else:
+                f_names.append(pics[i]['file_name'])
             i += 1
         return pics
 
     def json_dumping(self, data_in):
         with open('output.json', 'w') as f:
-            json.dump(data_in, f)
-
-        # with open('output.json') as f:
-        #     data_out = json.load(f)
-        #     pprint(data_out)
+            json.dump(data_in, f, indent=4)
 
 
 class YaUploader:
